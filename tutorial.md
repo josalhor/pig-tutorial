@@ -167,11 +167,13 @@ projected_data = FOREACH joined_data GENERATE aggregated_data::city
 sorted_data = ORDER projected_data BY city ASC;
 
 -- Clean and transform data using string functions
-cleaned_data = FOREACH sorted_data GENERATE city, REPLACE(avg_age, '.', ',')
-                                        AS avg_age, UPPER(city) AS city_upper;
+cleaned_data = FOREACH sorted_data GENERATE city,
+        (chararray)REPLACE((chararray)avg_age, '\\.', ',')
+        AS avg_age, UPPER(city) AS city_upper;
 
 -- Store cleaned data to a local CSV file
 STORE cleaned_data INTO '/path/to/cleaned_data.csv' USING PigStorage(',');
+
 ```
 
 We also demonstrate how to join data from multiple datasets using `JOIN`, and how to project only specific fields from the joined data using `FOREACH`. We use `ORDER` to sort the data by a field in ascending or descending order. Additionally, we show how to clean and transform data using string functions such as `REPLACE` and `UPPER`, and how to store the cleaned data to a local CSV file using `STORE` and `PigStorage`.
