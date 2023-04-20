@@ -128,7 +128,16 @@ Apache Pig provides many more advanced features, including support for complex d
 
 
 Demo
-=====
+=======
+
+Suppose you are a data analyst working for a chain of supermarkets that operates in multiple cities. The management wants to understand the demographics of their adult customer base (age > 18) in order to make informed decisions on targeted marketing campaigns and product offerings. Specifically, they are interested in knowing the average age of adult customers in each city, along with the total population of each city, to identify potential growth opportunities.
+
+Dataset
+-------------------
+
+You are provided with two datasets: one containing customer information (name, age, city), and another containing the population of each city. The management requires the data to be cleaned and sorted by city, with the average age of adult customers presented in a specific format (using a comma instead of a decimal point) and the city names capitalized.
+
+
 
 
 Internal Working and Distributed Computation

@@ -34,7 +34,7 @@ To install Pig on your system, follow these steps:
 3.  Set the `PIG_HOME` environment variable to the path of the extracted directory.
 4.  Add the Pig binary directory to your system's `PATH` variable.
 
-Data Maniuplation
+Data Manipulation
 ====================
 
 Data Loading
@@ -134,9 +134,86 @@ In this example, we register a custom UDF `my_udf.jar` using the `REGISTER` stat
 
 Apache Pig supports complex data types such as maps, bags, and tuples, which can be used to handle structured and semi-structured data.
 
+#### Tuples
+
+A tuple is an ordered set of fields, which can be of any data type, including other tuples or complex data types. Tuples can be used to represent records or rows in your data.
+
+Example:
+
+```
+-- Create a tuple
+person = ('John', 30, 'New York');
+```
+
+#### Bags
+
+A bag is an unordered collection of tuples. Bags can be used to represent a group of records or a set of rows.
+
+Example:
+
+```
+-- Create a bag
+people = {('John', 30, 'New York'), ('Alice', 28, 'San Francisco'), ('Bob', 32, 'Chicago')};
+```
+
+#### Maps
+
+A map is a collection of key-value pairs, where the keys must be of type `chararray` and the values can be of any data type, including complex data types. Maps can be used to represent data with dynamic schemas or sparse data.
+
+Example:
+
+```
+-- Create a map
+person_map = ['name' # 'John', 'age' # 30, 'city' # 'New York'];
+```
+
+### Working with Complex Data Types
+
+To work with complex data types in Pig Latin, you can use built-in functions and operators to access, manipulate, and transform the data.
+
+#### Accessing Complex Data Types
+
+To access fields in a tuple, use the `$` notation followed by the field index (starting from 0):
+
+```-- Access the first field (name) of a tuple
+name = person.$0;
+```
+
+To access values in a map, use the `#` notation followed by the key:
+
+```-- Access the 'name' value in a map
+name = person_map#'name';
+```
+
+To access elements in a bag, you can use the `FLATTEN` function or nested `FOREACH` statements.
+
+#### Manipulating and Transforming Complex Data Types
+
+You can use built-in functions and operators to manipulate and transform complex data types in your Pig Latin scripts.
+
+For example, you can use the `TOTUPLE` function to create a tuple from individual fields, the `TOBAG` function to create a bag from tuples, and the `TOMAP` function to create a map from key-value pairs.
+
+```-- Create a tuple, bag, and map using built-in functions
+new_person = TOTUPLE('Jane', 25, 'Los Angeles');
+new_people = TOBAG(new_person, ('John', 30, 'New York'));
+new_person_map = TOMAP('name', 'Jane', 'age', 25, 'city', 'Los Angeles');
+```
+
+You can also use the `CONCAT` function to concatenate two maps, the `UNION` function to merge two bags, and the `CROSS` function to create a Cartesian product of two bags.
+
+```-- Merge maps, bags, and create a Cartesian product of bags
+merged_maps = CONCAT(person_map, new_person_map);
+merged_people = UNION(people, new_people);
+people_cross = CROSS(people, new_people);
+```
+
 # Complete Example
 
-In this example, we first load data from a CSV file using `LOAD` and specify the schema with `AS` to define the fields. Then, we apply filters with `FILTER` to get only records that meet a specific condition. Next, we use `GROUP` to group the data by a certain field, and then use `FOREACH` and aggregation functions such as `AVG` to perform calculations on each group.
+Suppose you are a data analyst working for a chain of supermarkets that operates in multiple cities. The management wants to understand the demographics of their adult customer base (age > 18) in order to make informed decisions on targeted marketing campaigns and product offerings. Specifically, they are interested in knowing the average age of adult customers in each city, along with the total population of each city, to identify potential growth opportunities.
+
+You are provided with two datasets: one containing customer information (name, age, city), and another containing the population of each city. The management requires the data to be cleaned and sorted by city, with the average age of adult customers presented in a specific format (using a comma instead of a decimal point) and the city names capitalized.
+
+In this scenario, the given Apache Pig script will help you achieve the desired output by processing and combining the two datasets, filtering out customers aged 18 or below, aggregating the data, and applying the required transformations. The cleaned and sorted data can then be used by the management to make strategic decisions on marketing and expansion.
 
 
 ```
@@ -176,6 +253,9 @@ STORE cleaned_data INTO '/path/to/cleaned_data.csv' USING PigStorage(',');
 
 ```
 
+In this example, we first load data from a CSV file using `LOAD` and specify the schema with `AS` to define the fields. Then, we apply filters with `FILTER` to get only records that meet a specific condition. Next, we use `GROUP` to group the data by a certain field, and then use `FOREACH` and aggregation functions such as `AVG` to perform calculations on each group.
+
+
 We also demonstrate how to join data from multiple datasets using `JOIN`, and how to project only specific fields from the joined data using `FOREACH`. We use `ORDER` to sort the data by a field in ascending or descending order. Additionally, we show how to clean and transform data using string functions such as `REPLACE` and `UPPER`, and how to store the cleaned data to a local CSV file using `STORE` and `PigStorage`.
 
 Note: This is just a simple example and Apache Pig provides many more advanced features, including support for complex data types, nested queries, parameter substitution, and debugging capabilities.
@@ -189,6 +269,20 @@ Charlie,25,Chicago
 David,20,New York
 Eve,28,Los Angeles
 Frank,30,Chicago
+Grace,19,New York
+Hannah,21,Los Angeles
+Isaac,23,Chicago
+Jack,11,New York
+Karl,12,Los Angeles
+Lily,17,Chicago
+Mia,30,New York
+Nathan,29,Los Angeles
+Olivia,28,Chicago
+Penny,18,New York
+Quinn,19,Los Angeles
+Riley,20,Chicago
+Sarah,21,New York
+Tom,22,Los Angeles
 ```
 
 2.  other_data.csv:
