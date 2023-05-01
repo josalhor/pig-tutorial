@@ -1,7 +1,14 @@
 ---
-title: "Apache Pig: Data Manipulation"
+title: |
+ | \vspace{5cm} Apache Pig: Data Manipulation
 author: "Josep Maria Salvia Hornos"
+date: April 2023
+toc: true
+include-before:
+- '`\newpage{}`{=latex}'
 ---
+
+\pagebreak
 
 # Apache Pig: Data Manipulation
 
@@ -153,7 +160,7 @@ Example:
 
 ```
 -- Create a bag
-people = {('John', 30, 'New York'), ('Alice', 28, 'San Francisco'), ('Bob', 32, 'Chicago')};
+people = {('John', 30, 'New York'), ('Alice', 28, 'San Francisco')};
 ```
 
 #### Maps
@@ -297,6 +304,47 @@ You can save these files with the respective names and contents to your local fi
 
 Note: The format of the input files should match the schema specified in the `LOAD` statement of the Apache Pig script, which in the example is comma-separated values (CSV) with three fields: name (chararray), age (int), and city (chararray) for data.csv, and city (chararray) and population (int) for other_data.csv. If your input files have a different format or schema, you may need to modify the script accordingly.
 
+Supported File Formats
+======================
+
+Apache Pig provides support for various file formats, allowing users to easily load and store data in their preferred formats. In this section, we will discuss some of the popular file formats supported by Apache Pig and the reasons why each format may be used.
+
+## Handling Compression
+
+Apache Pig can work with both compressed and uncompressed data. It automatically detects the compression type of input files and handles them accordingly. Common compression formats, such as Gzip, Bzip2, and LZO, are supported. This feature helps reduce storage and network bandwidth requirements, resulting in faster data processing.
+
+## Binary Storage
+
+The `BinStorage` format is a simple binary format that is efficient for storing and loading data in Pig. It is well-suited for intermediate data storage during data processing, as it preserves data types and requires minimal serialization overhead.
+
+## JSON
+
+Using the `JsonLoader` and `JsonStorage` functions, Apache Pig can load and store data in JSON (JavaScript Object Notation) format. JSON is a widely-used, human-readable format that is compatible with many programming languages and platforms. JSON is suitable for data exchange and storage when working with web applications or when interoperability between systems is required.
+
+## Plain Text
+
+`TextLoader` and `PigStorage` functions allow Apache Pig to work with plain text files. `TextLoader` is used for loading unstructured text data, while `PigStorage` is used for loading and storing structured text data with a specified delimiter (e.g., comma, tab). Plain text formats are easy to read and write, making them suitable for storing human-readable data and for data exchange between systems with different file formats.
+
+## HBase
+
+Apache Pig can interact with HBase, a distributed column-oriented database, using the `HBaseStorage` function. HBase is designed for scalability and real-time data processing, making it a suitable choice for large-scale, high-throughput applications.
+
+## Avro
+
+`AvroStorage` allows Pig to work with Avro files, a compact and efficient binary format that supports schema evolution. Avro is often used in big data applications, as it provides fast serialization and deserialization, as well as support for complex data structures.
+
+## Trevni
+
+`TrevniStorage` enables Pig to work with Trevni files, a columnar storage format designed for efficient data storage and retrieval. Trevni is well-suited for large datasets, as it offers better compression and faster query performance compared to row-based storage formats.
+
+## Accumulo
+
+Apache Pig can interact with Apache Accumulo, a distributed key-value store, using the `AccumuloStorage` function. Accumulo provides robust security features and is designed for high performance, making it suitable for applications with strict data access controls and large-scale data processing requirements.
+
+## ORC
+
+Using the `OrcStorage` function, Apache Pig can load and store data in the ORC (Optimized Row Columnar) format. ORC is a highly efficient columnar storage format designed for Hadoop workloads, offering better compression and query performance compared to other file formats.
+
 Apache Pig: Internal Working and Distributed Computation
 =========================================================
 
@@ -329,6 +377,73 @@ Apache Pig provides load balancing and fault tolerance mechanisms to ensure reli
 1.  **Load Balancing**: Pig dynamically balances the workload across the cluster by evenly distributing the data blocks across the available nodes. This ensures that the processing is evenly distributed, and no single node becomes a bottleneck.
 
 2.  **Fault Tolerance**: Pig provides fault tolerance through data replication in HDFS. Data blocks are replicated across multiple nodes to ensure data durability and availability even in the case of node failures. If a node fails during processing, Pig automatically re-routes the failed tasks to other available nodes to ensure job completion.
+
+### Performance and Efficiency
+
+Apache Pig offers several features and techniques that improve the performance and efficiency of data processing tasks. In this section, we will discuss key aspects of Pig's performance and efficiency, including parallelism, multi-query execution, combiners, and sampling.
+
+#### Parallelism
+
+Apache Pig takes advantage of parallelism in distributed processing, enabling multiple tasks to run concurrently. By default, Pig determines the level of parallelism based on the number of input data blocks. Users can also manually control the parallelism level by setting the `PARALLEL` keyword for specific operations in their Pig scripts. This allows fine-grained control over resource allocation and can help optimize processing time.
+
+#### Multi-Query Execution
+
+Apache Pig can optimize the execution of multiple queries that share common operations by consolidating them into a single job. This technique, called multi-query execution, reduces the overhead associated with launching multiple MapReduce jobs and increases the overall efficiency of the system. Pig automatically identifies opportunities for multi-query execution and reorganizes the logical and physical plans accordingly.
+
+#### Combiners
+
+Pig can leverage combiners to reduce the amount of data transferred between the map and reduce phases of a MapReduce job. Combiners are intermediate aggregation functions that execute on the output of the map phase, aggregating data locally before it is shuffled and transferred to the reducers. By reducing the volume of data that needs to be transferred across the network, combiners can significantly improve the performance of data processing tasks.
+
+#### Sampling
+
+Apache Pig provides sampling techniques that enable users to work with smaller subsets of data for faster data processing and debugging. The `SAMPLE` operation in Pig allows users to randomly sample a fraction of the input data, reducing the amount of data that needs to be processed. This can be particularly useful for validating the correctness of Pig scripts or quickly evaluating the performance of different data processing strategies.
+
+### Diagnostics
+
+Apache Pig provides several diagnostic tools and commands to help users understand, debug, and optimize their Pig scripts. In this section, we will discuss key diagnostic commands in Pig, including `DESCRIBE`, `DUMP`, `EXPLAIN`, and `ILLUSTRATE`.
+
+#### DESCRIBE
+
+The `DESCRIBE` command is used to display the schema of a relation in a Pig script. It shows the names and data types of the fields in the relation, providing insight into the structure of the data. This can be especially helpful when working with complex, nested data or when joining multiple datasets with varying schemas.
+
+```pig\
+A = LOAD 'input.txt' AS (name:chararray, age:int);\
+DESCRIBE A;\
+```
+
+#### DUMP
+
+The `DUMP` command is used to print the contents of a relation to the console. This command is particularly useful for debugging purposes, as it allows users to quickly inspect the intermediate results of their Pig scripts. However, be cautious when using `DUMP` on large datasets, as it may consume a considerable amount of time and resources.
+
+```pig\
+A = LOAD 'input.txt' AS (name:chararray, age:int);\
+B = FILTER A BY age > 18;\
+DUMP B;\
+```
+
+#### EXPLAIN
+
+The `EXPLAIN` command provides a detailed description of the logical, physical, and MapReduce plans generated by Pig for a given script. This information can help users understand the execution process of their Pig scripts, identify bottlenecks, and optimize their data processing tasks.
+
+```pig\
+A = LOAD 'input.txt' AS (name:chararray, age:int);\
+B = FILTER A BY age > 18;\
+C = GROUP B BY name;\
+EXPLAIN C;\
+```
+
+#### ILLUSTRATE
+
+The `ILLUSTRATE` command generates example data and demonstrates the step-by-step execution of a Pig script using that data. This command can help users gain a deeper understanding of the data processing operations in their scripts and verify the correctness of their logic. The `ILLUSTRATE` command is particularly useful when working with complex, multi-step data processing pipelines.
+
+```pig\
+A = LOAD 'input.txt' AS (name:chararray, age:int);\
+B = FILTER A BY age > 18;\
+C = GROUP B BY name;\
+D = FOREACH C GENERATE group, COUNT(B);\
+ILLUSTRATE D;\
+```
+
 
 Summary
 ===============
